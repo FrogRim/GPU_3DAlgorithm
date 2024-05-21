@@ -1,13 +1,11 @@
-//Çì´õ
+//í—¤ë”
 #pragma once
 #include "pmp/surface_mesh.h"
 #include "gl/freeglut.h"
 #include <cassert> 
 #include <stack>
 
-
-
-// Æ÷¿öµå ¼±¾ğ
+// í¬ì›Œë“œ ì„ ì–¸
 class BVH;
 
 class DrawComponent
@@ -17,30 +15,28 @@ public:
 
     void Draw();
 
-
-
     pmp::SurfaceMesh mesh;
 
-    BVH* bvh;  // BVH °´Ã¼ Æ÷ÀÎÅÍ
+    BVH* bvh;  // BVH ê°ì²´ í¬ì¸í„°
 
     int arrowNum0 = 0;
     int arrowNum1 = 0;
 
-    ~DrawComponent() {  // ¼Ò¸êÀÚ
-        delete bvh;  // BVH °´Ã¼ »èÁ¦
+    ~DrawComponent() {  // ì†Œë©¸ì
+        delete bvh;  // BVH ê°ì²´ ì‚­ì œ
     }
 };
 
 class AABB
 {
 public:
-    AABB() {} // ±âº» »ı¼ºÀÚ
-    AABB(pmp::Point pmin, pmp::Point pmax) : pmin(pmin), pmax(pmax) {} // ÃÖ¼ÒÁ¡°ú ÃÖ´ëÁ¡À¸·Î ÃÊ±âÈ­
+    AABB() {} // ê¸°ë³¸ ìƒì„±ì
+    AABB(pmp::Point pmin, pmp::Point pmax) : pmin(pmin), pmax(pmax) {} // ìµœì†Œì ê³¼ ìµœëŒ€ì ìœ¼ë¡œ ì´ˆê¸°í™”
 
-    pmp::Point pmin; // ÃÖ¼Ò ÁÂÇ¥
-    pmp::Point pmax; // ÃÖ´ë ÁÂÇ¥
+    pmp::Point pmin; // ìµœì†Œ ì¢Œí‘œ
+    pmp::Point pmax; // ìµœëŒ€ ì¢Œí‘œ
 
-    // ´Ù¸¥ AABB¿ÍÀÇ ±³Â÷ ¿©ºÎ ÆÇ´Ü
+    // ë‹¤ë¥¸ AABBì™€ì˜ êµì°¨ ì—¬ë¶€ íŒë‹¨
     bool intersect(const AABB& other)
     {
         if (pmax[0] < other.pmin[0] || pmin[0] > other.pmax[0])
@@ -52,7 +48,7 @@ public:
         return true;
     }
 
-    // Æ¯Á¤ Á¡°úÀÇ ±³Â÷ ¿©ºÎ ÆÇ´Ü
+    // íŠ¹ì • ì ê³¼ì˜ êµì°¨ ì—¬ë¶€ íŒë‹¨
     bool intersect(const pmp::Point& p)
     {
         if (p[0] < pmin[0] || p[0] > pmax[0]) return false;
@@ -61,7 +57,7 @@ public:
         return true;
     }
 
-    // Æ¯Á¤ Á¡¿¡¼­ ¹æÇâ º¤ÅÍ¸¦ µû¶ó ±³Â÷ ¿©ºÎ ÆÇ´Ü
+    // íŠ¹ì • ì ì—ì„œ ë°©í–¥ ë²¡í„°ë¥¼ ë”°ë¼ êµì°¨ ì—¬ë¶€ íŒë‹¨
     bool intersect(const pmp::Point& p, const pmp::Point& d)
     {
         double tmin = 0.0;
@@ -90,7 +86,7 @@ public:
         return true;
     }
 
-    // ´Ù¸¥ AABB¿Í ÇÕÄ§
+    // ë‹¤ë¥¸ AABBì™€ í•©ì¹¨
     AABB merge(const AABB& other)
     {
         pmp::Point newPmin, newPmax;
@@ -102,7 +98,7 @@ public:
         return AABB(newPmin, newPmax);
     }
 
-    // °¡Àå ±ä Ãà ¹İÈ¯
+    // ê°€ì¥ ê¸´ ì¶• ë°˜í™˜
     int longestAxis()
     {
         pmp::Point d = pmax - pmin;
@@ -111,13 +107,13 @@ public:
         return 2;
     }
 
-    // Áß½ÉÁ¡ ¹İÈ¯
+    // ì¤‘ì‹¬ì  ë°˜í™˜
     pmp::Point center()
     {
         return 0.5 * (pmin + pmax);
     }
 
-    // ³ëµå¸¦ µÎ °³·Î ºĞÇÒ
+    // ë…¸ë“œë¥¼ ë‘ ê°œë¡œ ë¶„í• 
     void split(AABB& left, AABB& right)
     {
         int axis = longestAxis();
@@ -127,80 +123,92 @@ public:
         pmp::Point pmin_r = pmin;
         pmp::Point pmax_r = pmax;
 
-        pmax_l[axis] = mid; // ¿ŞÂÊ »óÀÚÀÇ ÃÖ´ë AABB ¼öÁ¤
-        pmin_r[axis] = mid; // ¿À¸¥ÂÊ »óÀÚÀÇ ÃÖ¼Ò AABB ¼öÁ¤
+        pmax_l[axis] = mid; // ì™¼ìª½ ìƒìì˜ ìµœëŒ€ AABB ìˆ˜ì •
+        pmin_r[axis] = mid; // ì˜¤ë¥¸ìª½ ìƒìì˜ ìµœì†Œ AABB ìˆ˜ì •
 
         left = AABB(pmin_l, pmax_l);
         right = AABB(pmin_r, pmax_r);
     }
-
-    
 };
 
 class Node {
 public:
-    AABB aabb; // AABB °´Ã¼
-    std::vector<pmp::Face> face_index; // ¸é ÀÎµ¦½º ¸ñ·Ï
-    Node* left; // ¿ŞÂÊ ÀÚ½Ä ³ëµå
-    Node* right; // ¿À¸¥ÂÊ ÀÚ½Ä ³ëµå
-    int level; // ³ëµå ·¹º§
+    AABB aabb; // AABB ê°ì²´
+    std::vector<int> face_index; // ë©´ ì¸ë±ìŠ¤ ëª©ë¡
+    Node* left; // ì™¼ìª½ ìì‹ ë…¸ë“œ
+    Node* right; // ì˜¤ë¥¸ìª½ ìì‹ ë…¸ë“œ
+    int level; // ë…¸ë“œ ë ˆë²¨
+    float color[3]; // ìƒ‰ìƒ
 
-    Node() : left(nullptr), right(nullptr) {} // ±âº» »ı¼ºÀÚ
+    Node() : left(nullptr), right(nullptr) {} // ê¸°ë³¸ ìƒì„±ì
 };
 
 class BVH
 {
 public:
     int cnt = 0;
-    explicit BVH(pmp::SurfaceMesh& mesh) : mesh(mesh), root(nullptr) {} // »ı¼ºÀÚ: ¸Ş½Ã ÂüÁ¶·Î BVH ÃÊ±âÈ­
-    int maxDepth = 128; // Àç±Í ±íÀÌ Á¦ÇÑ¼³Á¤ -> ¿À¹öÇÃ·Î¿ì ¹æÁö
-    pmp::SurfaceMesh& mesh; // ¸Ş½Ã ÂüÁ¶
-    Node* root; // ·çÆ® ³ëµå
+    explicit BVH(pmp::SurfaceMesh& mesh) : mesh(mesh), root(nullptr) {} // ìƒì„±ì: ë©”ì‹œ ì°¸ì¡°ë¡œ BVH ì´ˆê¸°í™”
+    int maxDepth = 8; // ì¬ê·€ ê¹Šì´ ì œí•œì„¤ì • -> ì˜¤ë²„í”Œë¡œìš° ë°©ì§€
+    pmp::SurfaceMesh& mesh; // ë©”ì‹œ ì°¸ì¡°
+    Node* root; // ë£¨íŠ¸ ë…¸ë“œ
 
     void build()
     {
-        std::vector<pmp::Face> faces(mesh.faces().begin(), mesh.faces().end());
+        std::vector<int> faces;
+        for (auto f : mesh.faces()) {
+            faces.push_back(f.idx());
+        }
         root = buildRecursive(faces, 0, maxDepth);
         std::cout << "BVH build complete." << std::endl;
     }
 
-    void draw(int arrowNum0, int arrowNum1) // BVH¸¦ ½Ã°¢È­ÇÏ±â À§ÇØ ±×¸²
+    void draw(int arrowNum0, int arrowNum1) // BVHë¥¼ ì‹œê°í™”í•˜ê¸° ìœ„í•´ ê·¸ë¦¼
     {
-        drawRecursive(root, 0, arrowNum0, arrowNum1); // ·çÆ®¿¡¼­ ½ÃÀÛÇÏ¿© Àç±ÍÀûÀ¸·Î ±×¸²
+        drawRecursive(root, 0, arrowNum0, arrowNum1); // ë£¨íŠ¸ì—ì„œ ì‹œì‘í•˜ì—¬ ì¬ê·€ì ìœ¼ë¡œ ê·¸ë¦¼
     }
     void validate()
     {
-        assert(validateNode(root, nullptr)); // ·çÆ® ³ëµåºÎÅÍ °ËÁõ ½ÃÀÛ
+        assert(validateNode(root, nullptr)); // ë£¨íŠ¸ ë…¸ë“œë¶€í„° ê²€ì¦ ì‹œì‘
     }
 private:
-    Node* buildRecursive(const std::vector<pmp::Face>& faces, int level, int maxDepth) {
-       
+    Node* buildRecursive(const std::vector<int>& faces, int level, int maxDepth) {
+
         if (level > maxDepth || faces.empty()) {
             Node* node = new Node;
             node->level = level;
-            node->face_index = faces; // ºñ¾îÀÖÁö ¾Ê´Ù¸é, ÀÌÀü ¸éµéÀ» Æ÷ÇÔ
+            node->face_index = faces; // ë¹„ì–´ìˆì§€ ì•Šë‹¤ë©´, ì´ì „ ë©´ë“¤ì„ í¬í•¨
+
+            node->color[0] = static_cast<float>((level * 40) % 255) / 255.0f;
+            node->color[1] = static_cast<float>((level * 70) % 255) / 255.0f;
+            node->color[2] = static_cast<float>((level * 90) % 255) / 255.0f;
+
             return node;
         }
 
         Node* node = new Node;
         node->level = level;
 
-        // ¸ğµç ¸éÀÇ AABB °è»ê
+        // ìƒ‰ìƒ ì„¤ì • 
+        node->color[0] = static_cast<float>((level * 40) % 255) / 255.0f;
+        node->color[1] = static_cast<float>((level * 70) % 255) / 255.0f;
+        node->color[2] = static_cast<float>((level * 90) % 255) / 255.0f;
+
+        // ëª¨ë“  ë©´ì˜ AABB ê³„ì‚°
         AABB aabb;
         for (auto f : faces) {
             aabb = aabb.merge(computeAABB(f));
         }
         node->aabb = aabb;
 
-        if (faces.size() <= 1) {  // ¸®ÇÁ ³ëµå Á¶°Ç
+        if (faces.size() <= 1) {  // ë¦¬í”„ ë…¸ë“œ ì¡°ê±´
             node->face_index = faces;
             std::cout << "Leaf node created at level " << level << " with 1 face." << std::endl;
             return node;
         }
 
-        // ¸éÀ» ÁÂ¿ì ÀÚ½Ä ³ëµå·Î ºĞÇÒ
+        // ë©´ì„ ì¢Œìš° ìì‹ ë…¸ë“œë¡œ ë¶„í• 
         AABB leftAABB, rightAABB;
-        std::vector<pmp::Face> leftFaces, rightFaces;
+        std::vector<int> leftFaces, rightFaces;
         aabb.split(leftAABB, rightAABB);
 
         for (auto f : faces) {
@@ -212,12 +220,13 @@ private:
             double splitPoint = aabb.center()[axis];
 
             int leftCount = 0, rightCount = 0;
-            auto hf = mesh.halfedge(f);
+            auto face = pmp::Face(f);
+            auto hf = mesh.halfedge(face);
             auto h = hf;
             pmp::Point triangleCenter(0.0, 0.0, 0.0);
             int vertexCount = 0;
 
-            // »ï°¢ÇüÀÇ °¢ ²ÀÁşÁ¡ À§Ä¡¸¦ Á¶»çÇÏ¿© ºĞÇÒ ±ÔÄ¢À» °áÁ¤
+            // ì‚¼ê°í˜•ì˜ ê° ê¼­ì§“ì  ìœ„ì¹˜ë¥¼ ì¡°ì‚¬í•˜ì—¬ ë¶„í•  ê·œì¹™ì„ ê²°ì •
             do {
                 pmp::Vertex v = mesh.to_vertex(h);
                 pmp::Point pos = mesh.position(v);
@@ -232,49 +241,46 @@ private:
                 h = mesh.next_halfedge(h);
             } while (h != hf);
 
-            triangleCenter /= vertexCount; // »ï°¢ÇüÀÇ Áß½É °è»ê
+            triangleCenter /= vertexCount; // ì‚¼ê°í˜•ì˜ ì¤‘ì‹¬ ê³„ì‚°
 
-            // »ï°¢ÇüÀÌ ºĞÇÒ Æò¸éÀ» °¡·ÎÁö¸£´Â °æ¿ì ¾çÂÊ ÀÚ½Ä¿¡ Ãß°¡
+            // ì‚¼ê°í˜•ì´ ë¶„í•  í‰ë©´ì„ ê°€ë¡œì§€ë¥´ëŠ” ê²½ìš° ì–‘ìª½ ìì‹ì— ì¶”ê°€
             if (leftIntersect && rightIntersect) {
                 leftFaces.push_back(f);
                 rightFaces.push_back(f);
             }
             else {
-                // »ï°¢Çü Áß½ÉÀ» ±âÁØÀ¸·Î ºĞ·ùÇÏ¿© ´õ ±ÕÇü ÀâÈù ºĞÇÒÀ» À¯µµ
+                // ì‚¼ê°í˜• ì¤‘ì‹¬ì„ ê¸°ì¤€ìœ¼ë¡œ ë¶„ë¥˜í•˜ì—¬ ë” ê· í˜• ì¡íŒ ë¶„í• ì„ ìœ ë„
                 if (triangleCenter[axis] < splitPoint) {
                     leftFaces.push_back(f);
                     if (rightCount > 0) {
-                        rightFaces.push_back(f); // ²ÀÁşÁ¡ÀÌ ¿À¸¥ÂÊ¿¡µµ ÀÖÀ¸¸é ¿À¸¥ÂÊ¿¡µµ Ãß°¡
+                        rightFaces.push_back(f); // ê¼­ì§“ì ì´ ì˜¤ë¥¸ìª½ì—ë„ ìˆìœ¼ë©´ ì˜¤ë¥¸ìª½ì—ë„ ì¶”ê°€
                     }
                 }
                 else {
                     rightFaces.push_back(f);
                     if (leftCount > 0) {
-                        leftFaces.push_back(f); // ²ÀÁşÁ¡ÀÌ ¿ŞÂÊ¿¡µµ ÀÖÀ¸¸é ¿ŞÂÊ¿¡µµ Ãß°¡
+                        leftFaces.push_back(f); // ê¼­ì§“ì ì´ ì™¼ìª½ì—ë„ ìˆìœ¼ë©´ ì™¼ìª½ì—ë„ ì¶”ê°€
                     }
                 }
             }
-
-			
         }
 
-        // ºĞÇÒÀÌ ½ÇÆĞÇßÀ» °æ¿ì ÀÌ ³ëµå¸¦ ¸®ÇÁ ³ëµå·Î ¸¸µê
+        // ë¶„í• ì´ ì‹¤íŒ¨í–ˆì„ ê²½ìš° ì´ ë…¸ë“œë¥¼ ë¦¬í”„ ë…¸ë“œë¡œ ë§Œë“¦
         if (leftFaces.empty() || rightFaces.empty()) {
-            node->face_index = faces; // ¸ğµç ¸éÀ» ÇöÀç ³ëµå¿¡ ÀúÀå
+            node->face_index = faces; // ëª¨ë“  ë©´ì„ í˜„ì¬ ë…¸ë“œì— ì €ì¥
             std::cerr << "Splitting failed at level " << level << "; node becomes a leaf with " << faces.size() << " faces." << std::endl;
             return node;
         }
 
-        // ¼º°øÀûÀ¸·Î ºĞÇÒµÇ¾ú´Ù¸é Àç±ÍÀûÀ¸·Î ÀÚ½Ä ³ëµå »ı¼º
+        // ì„±ê³µì ìœ¼ë¡œ ë¶„í• ë˜ì—ˆë‹¤ë©´ ì¬ê·€ì ìœ¼ë¡œ ìì‹ ë…¸ë“œ ìƒì„±
         node->left = buildRecursive(leftFaces, level + 1, maxDepth);
         node->right = buildRecursive(rightFaces, level + 1, maxDepth);
 
         return node;
     }
 
-
-
-    AABB computeAABB(pmp::Face f) {
+    AABB computeAABB(int face_idx) {
+        pmp::Face f(face_idx);
         auto hf = mesh.halfedge(f);
         auto h = hf;
         pmp::Vertex v = mesh.to_vertex(h);
@@ -288,23 +294,13 @@ private:
         }
         return aabb;
     }
-    void drawAABB(const AABB& box,int cnt) {
 
-        if (cnt == 0)
-		{
-			glColor3f(1.0f, 0.0f, 0.0f); // »¡°£»ö ¼³Á¤
-		}
-		else if (cnt == 1)
-		{
-			glColor3f(0.0f, 0.0f, 1.0f); // ÆÄ¶õ»ö ¼³Á¤
-		}
-		else
-		{
-            glColor3f(0.0f, 1.0f, 0.0f); // ÃÊ·Ï»ö ¼³Á¤
-		}
-        
-        glBegin(GL_LINE_LOOP); // ¼±ºĞÀ¸·Î ¹Ú½º¸¦ ±×¸³´Ï´Ù
-        // ¹Ú½ºÀÇ ¹Ù´Ú
+    void drawAABB(const AABB& box, float color[3]) {
+
+        glColor3f(color[0], color[1], color[2]); // ë…¸ë“œì˜ ìƒ‰ìƒ ì„¤ì •
+
+        glBegin(GL_LINE_LOOP); // ì„ ë¶„ìœ¼ë¡œ ë°•ìŠ¤ë¥¼ ê·¸ë¦½ë‹ˆë‹¤
+        // ë°•ìŠ¤ì˜ ë°”ë‹¥
         glVertex3f(box.pmin[0], box.pmin[1], box.pmin[2]);
         glVertex3f(box.pmax[0], box.pmin[1], box.pmin[2]);
         glVertex3f(box.pmax[0], box.pmin[1], box.pmax[2]);
@@ -312,7 +308,7 @@ private:
         glEnd();
 
         glBegin(GL_LINE_LOOP);
-        // ¹Ú½ºÀÇ »ó´Ü
+        // ë°•ìŠ¤ì˜ ìƒë‹¨
         glVertex3f(box.pmin[0], box.pmax[1], box.pmin[2]);
         glVertex3f(box.pmax[0], box.pmax[1], box.pmin[2]);
         glVertex3f(box.pmax[0], box.pmax[1], box.pmax[2]);
@@ -320,7 +316,7 @@ private:
         glEnd();
 
         glBegin(GL_LINES);
-        // ¹Ú½ºÀÇ ¼öÁ÷ ¼±
+        // ë°•ìŠ¤ì˜ ìˆ˜ì§ ì„ 
         glVertex3f(box.pmin[0], box.pmin[1], box.pmin[2]);
         glVertex3f(box.pmin[0], box.pmax[1], box.pmin[2]);
 
@@ -337,82 +333,69 @@ private:
 
     void drawRecursive(Node* node, int currentLevel, int arrowNum0, int arrowNum1)
     {
-		int cnt = node->level;
         if (node == nullptr) {
-
-            std::cout << "not node" << std::endl;
+            std::cout << "Node is null" << std::endl;
             return;
         }
-        // ³ëµå ·»´õ¸µ ¼³Á¤
-        if (currentLevel == arrowNum0) {
-            glColor3f(1.0, 0.0, 0.0);  // ·¹º§ÀÌ arrowNum0¿¡ ÇØ´çÇÏ¸é »¡°£»ö
+
+        // ìì‹ ë…¸ë“œë“¤ì„ ì¬ê·€ì ìœ¼ë¡œ ê·¸ë¦¬ê¸°
+        if (node->left != nullptr) {
+            drawRecursive(node->left, currentLevel + 1, arrowNum0, arrowNum1);
         }
-        else if (currentLevel == arrowNum1) {
-            glColor3f(0.0, 0.0, 1.0);  // ·¹º§ÀÌ arrowNum1¿¡ ÇØ´çÇÏ¸é ÆÄ¶õ»ö
-        }
-        else {
-            glColor3f(0.5, 0.5, 0.5);  // ±× ¿ÜÀÇ ·¹º§Àº È¸»ö
+        if (node->right != nullptr) {
+            drawRecursive(node->right, currentLevel + 1, arrowNum0, arrowNum1);
         }
 
-        if (node->left == nullptr && node->right == nullptr) // ¸®ÇÁ ³ëµåÀÎ °æ¿ì,
-        {
-            // ¸ğµç ¸®ÇÁ ³ëµå¿¡¼­ ±×·¡ÇÈÀ» ±×¸²
-            for (auto& f : node->face_index) {
-               
-                glBegin(GL_TRIANGLES);
-                auto hf = mesh.halfedge(f);
-                auto h = hf;
-                do {
-                    pmp::Vertex v = mesh.to_vertex(h);
-                    pmp::Point pos = mesh.position(v);
-                    glVertex3d(pos[0], pos[1], pos[2]);
-                    h = mesh.next_halfedge(h);
-                } while (h != hf);
+        // ë…¸ë“œì˜ ìƒ‰ìƒì„ ì„¤ì •í•˜ê³ , í•´ë‹¹ ë…¸ë“œì˜ Faceë“¤ì„ ê·¸ ìƒ‰ìƒìœ¼ë¡œ ë Œë”ë§
+        glColor3f(node->color[0], node->color[1], node->color[2]);
 
-            }
-            glEnd();
-            std::cout << "Rendering at leaf node, level " << currentLevel << std::endl;
+        glBegin(GL_TRIANGLES);
+        for (auto& f_idx : node->face_index) {
+            pmp::Face f(f_idx);
+            auto hf = mesh.halfedge(f);
+            auto h = hf;
+            do {
+                pmp::Vertex v = mesh.to_vertex(h);
+                pmp::Point pos = mesh.position(v);
+                glVertex3d(pos[0], pos[1], pos[2]);
+                h = mesh.next_halfedge(h);
+            } while (h != hf);
         }
-        else {
+        glEnd();
 
-			drawAABB(node->aabb,cnt+1);  // ³ëµåÀÇ AABB¸¦ ±×¸²
-            if (node->left != nullptr) {
-                drawRecursive(node->left, currentLevel + 1, arrowNum0, arrowNum1);  // ¿ŞÂÊ ÀÚ½Ä ³ëµå Àç±ÍÀûÀ¸·Î ±×¸²
-            }
-            if (node->right != nullptr) {
-                drawRecursive(node->right, currentLevel + 1, arrowNum0, arrowNum1); // ¿À¸¥ÂÊ ÀÚ½Ä ³ëµå Àç±ÍÀûÀ¸·Î ±×¸²
-            }
-			std::cout << "Rendering at internal node, level " << currentLevel <<", " << arrowNum0 << " ," << arrowNum1 << std::endl;
-        }
+        // ë…¸ë“œì˜ AABB ê·¸ë¦¬ê¸°
+        //drawAABB(node->aabb, node->color);
 
+        
     }
 
-    // ³ëµåÀÇ À¯È¿¼ºÀ» °ËÁõÇÏ´Â Àç±Í ÇÔ¼ö
+
+    // ë…¸ë“œì˜ ìœ íš¨ì„±ì„ ê²€ì¦í•˜ëŠ” ì¬ê·€ í•¨ìˆ˜
     bool validateNode(Node* node, Node* parent)
     {
-        // ³ëµå°¡ nullptrÀÎÁö È®ÀÎ
+        // ë…¸ë“œê°€ nullptrì¸ì§€ í™•ì¸
         if (!node) return true;
 
-        // ³ëµå°¡ ÃÖ¼Ò 1°³ ÀÌ»óÀÇ »ï°¢ÇüÀ» Æ÷ÇÔÇÏ´ÂÁö È®ÀÎ
+        // ë…¸ë“œê°€ ìµœì†Œ 1ê°œ ì´ìƒì˜ ì‚¼ê°í˜•ì„ í¬í•¨í•˜ëŠ”ì§€ í™•ì¸
         assert(!node->face_index.empty());
 
-        // »óÀ§ BV°¡ ÇÏÀ§ BV¸¦ Æ÷ÇÔÇÏ´ÂÁö È®ÀÎ
+        // ìƒìœ„ BVê°€ í•˜ìœ„ BVë¥¼ í¬í•¨í•˜ëŠ”ì§€ í™•ì¸
         if (parent) {
             assert(parent->aabb.intersect(node->aabb));
         }
 
-        // BV°¡ ÀÚ½ÅÀÇ ¸ğµç »ï°¢ÇüÀ» ¿Ã¹Ù¸£°Ô Æ÷ÇÔÇÏ´ÂÁö È®ÀÎ
+        // BVê°€ ìì‹ ì˜ ëª¨ë“  ì‚¼ê°í˜•ì„ ì˜¬ë°”ë¥´ê²Œ í¬í•¨í•˜ëŠ”ì§€ í™•ì¸
         AABB nodeAABB;
-        for (auto& face : node->face_index) {
-            nodeAABB = nodeAABB.merge(computeAABB(face));
+        for (auto& face_idx : node->face_index) {
+            nodeAABB = nodeAABB.merge(computeAABB(face_idx));
         }
         assert(node->aabb.intersect(nodeAABB));
 
-        // Àç±ÍÀûÀ¸·Î ÀÚ½Ä ³ëµå °ËÁõ
+        // ì¬ê·€ì ìœ¼ë¡œ ìì‹ ë…¸ë“œ ê²€ì¦
         bool leftValid = validateNode(node->left, node);
         bool rightValid = validateNode(node->right, node);
 
-        // ÀÚ½Ä ³ëµåÀÇ ¿¬°áÀÌ Á¤»óÀûÀÎÁö È®ÀÎ (¿¹: ¾çÂÊ ÀÚ½ÄÀÌ ¸ğµÎ ÀÖ°Å³ª µÑ ´Ù ¾ø°Å³ª)
+        // ìì‹ ë…¸ë“œì˜ ì—°ê²°ì´ ì •ìƒì ì¸ì§€ í™•ì¸ (ì˜ˆ: ì–‘ìª½ ìì‹ì´ ëª¨ë‘ ìˆê±°ë‚˜ ë‘˜ ë‹¤ ì—†ê±°ë‚˜)
         assert((node->left && node->right) || (!node->left && !node->right));
 
         return leftValid && rightValid;

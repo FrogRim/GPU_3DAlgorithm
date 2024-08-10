@@ -1,13 +1,10 @@
-//Çì´õ
+//í—¤ë”
 #pragma once
 #include "pmp/surface_mesh.h"
 #include "gl/freeglut.h"
 #include <stdexcept>
 #include <queue>
 #include <vector>
-
-// Æ÷¿öµå ¼±¾ğ
-//class BVH;
 
 class DrawComponent
 {
@@ -19,16 +16,16 @@ public:
     pmp::SurfaceMesh mesh1;
     pmp::SurfaceMesh mesh2;
 
-    class BVH* bvh1 = nullptr;  // BVH °´Ã¼ Æ÷ÀÎÅÍ
-    class BVH* bvh2 = nullptr;  // BVH °´Ã¼ Æ÷ÀÎÅÍ
+    class BVH* bvh1 = nullptr;  // BVH ê°ì²´ í¬ì¸í„°
+    class BVH* bvh2 = nullptr;  // BVH ê°ì²´ í¬ì¸í„°
 
-	class BVTT* bvtt = nullptr;  // BVTT °´Ã¼ Æ÷ÀÎÅÍ
+	class BVTT* bvtt = nullptr;  // BVTT ê°ì²´ í¬ì¸í„°
 
     int arrowNum0 = 0;
     int arrowNum1 = 0;
 
-    ~DrawComponent() {  // ¼Ò¸êÀÚ
-        delete bvh1;  // BVH °´Ã¼ »èÁ¦
+    ~DrawComponent() {  // ì†Œë©¸ì
+        delete bvh1;  // BVH ê°ì²´ ì‚­ì œ
         delete bvh2;
 		delete bvtt;
     }
@@ -41,59 +38,59 @@ public:
         pmin = pmp::Point(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
         pmax = pmp::Point(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest());
     }
-    // ±âº» »ı¼ºÀÚ
-    AABB(pmp::Point pmin, pmp::Point pmax) : pmin(pmin), pmax(pmax) {} // ÃÖ¼ÒÁ¡°ú ÃÖ´ëÁ¡À¸·Î ÃÊ±âÈ­
+    // ê¸°ë³¸ ìƒì„±ì
+    AABB(pmp::Point pmin, pmp::Point pmax) : pmin(pmin), pmax(pmax) {} // ìµœì†Œì ê³¼ ìµœëŒ€ì ìœ¼ë¡œ ì´ˆê¸°í™”
 
-    pmp::Point pmin; // ÃÖ¼Ò ÁÂÇ¥
-    pmp::Point pmax; // ÃÖ´ë ÁÂÇ¥
+    pmp::Point pmin; // ìµœì†Œ ì¢Œí‘œ
+    pmp::Point pmax; // ìµœëŒ€ ì¢Œí‘œ
 
-    // ´Ù¸¥ AABB¿ÍÀÇ ±³Â÷ ¿©ºÎ ÆÇ´Ü
+    // ë‹¤ë¥¸ AABBì™€ì˜ êµì°¨ ì—¬ë¶€ íŒë‹¨
     bool intersect(const AABB& other);
 
-    // Æ¯Á¤ Á¡°úÀÇ ±³Â÷ ¿©ºÎ ÆÇ´Ü
+    // íŠ¹ì • ì ê³¼ì˜ êµì°¨ ì—¬ë¶€ íŒë‹¨
     bool intersect(const pmp::Point& p);
 
-    // Æ¯Á¤ Á¡¿¡¼­ ¹æÇâ º¤ÅÍ¸¦ µû¶ó ±³Â÷ ¿©ºÎ ÆÇ´Ü
+    // íŠ¹ì • ì ì—ì„œ ë°©í–¥ ë²¡í„°ë¥¼ ë”°ë¼ êµì°¨ ì—¬ë¶€ íŒë‹¨
     bool intersect(const pmp::Point& p, const pmp::Point& d);
 
-    // ´Ù¸¥ AABB¿Í ÇÕÄ§
+    // ë‹¤ë¥¸ AABBì™€ í•©ì¹¨
     AABB merge(const AABB& other);
 
-    // °¡Àå ±ä Ãà ¹İÈ¯
+    // ê°€ì¥ ê¸´ ì¶• ë°˜í™˜
     int longestAxis();
 
-    // Áß½ÉÁ¡ ¹İÈ¯
+    // ì¤‘ì‹¬ì  ë°˜í™˜
     pmp::Point center();
 
-    // ³ëµå¸¦ µÎ °³·Î ºĞÇÒ
+    // ë…¸ë“œë¥¼ ë‘ ê°œë¡œ ë¶„í• 
     void split(AABB& left, AABB& right);
 };
 
 class Node {
 public:
-    AABB aabb; // AABB °´Ã¼
-    std::vector<int> face_index; // ¸é ÀÎµ¦½º ¸ñ·Ï
-    Node* left; // ¿ŞÂÊ ÀÚ½Ä ³ëµå
-    Node* right; // ¿À¸¥ÂÊ ÀÚ½Ä ³ëµå
-    int level; // ³ëµå ·¹º§
-    float color[3]; // »ö»ó
+    AABB aabb; // AABB ê°ì²´
+    std::vector<int> face_index; // ë©´ ì¸ë±ìŠ¤ ëª©ë¡
+    Node* left; // ì™¼ìª½ ìì‹ ë…¸ë“œ
+    Node* right; // ì˜¤ë¥¸ìª½ ìì‹ ë…¸ë“œ
+    int level; // ë…¸ë“œ ë ˆë²¨
+    float color[3]; // ìƒ‰ìƒ
 
-    Node() : left(nullptr), right(nullptr) {} // ±âº» »ı¼ºÀÚ
+    Node() : left(nullptr), right(nullptr) {} // ê¸°ë³¸ ìƒì„±ì
 };
 
 class BVH
 {
 public:
     int cnt = 0;
-    explicit BVH(pmp::SurfaceMesh& mesh) : mesh(mesh), root(nullptr) {} // »ı¼ºÀÚ: ¸Ş½Ã ÂüÁ¶·Î BVH ÃÊ±âÈ­
-    int maxDepth = 8; // Àç±Í ±íÀÌ Á¦ÇÑ¼³Á¤ -> ¿À¹öÇÃ·Î¿ì ¹æÁö
-    pmp::SurfaceMesh& mesh; // ¸Ş½Ã ÂüÁ¶
-    Node* root; // ·çÆ® ³ëµå
+    explicit BVH(pmp::SurfaceMesh& mesh) : mesh(mesh), root(nullptr) {} // ìƒì„±ì: ë©”ì‹œ ì°¸ì¡°ë¡œ BVH ì´ˆê¸°í™”
+    int maxDepth = 8; // ì¬ê·€ ê¹Šì´ ì œí•œì„¤ì • -> ì˜¤ë²„í”Œë¡œìš° ë°©ì§€
+    pmp::SurfaceMesh& mesh; // ë©”ì‹œ ì°¸ì¡°
+    Node* root; // ë£¨íŠ¸ ë…¸ë“œ
 
     void build();
 
-    void draw(int arrowNum0, int arrowNum1); // BVH¸¦ ½Ã°¢È­ÇÏ±â À§ÇØ ±×¸²
-    void validate(); // BVH À¯È¿¼º °Ë»ç
+    void draw(int arrowNum0, int arrowNum1); // BVHë¥¼ ì‹œê°í™”í•˜ê¸° ìœ„í•´ ê·¸ë¦¼
+    void validate(); // BVH ìœ íš¨ì„± ê²€ì‚¬
 
 private:
     Node* buildRecursive(const std::vector<int>& faces, int level);
@@ -106,7 +103,7 @@ private:
 
     void drawRecursive(Node* node, int currentLevel, int arrowNum0, int arrowNum1);
 
-    // ³ëµåÀÇ À¯È¿¼ºÀ» °ËÁõÇÏ´Â Àç±Í ÇÔ¼ö
+    // ë…¸ë“œì˜ ìœ íš¨ì„±ì„ ê²€ì¦í•˜ëŠ” ì¬ê·€ í•¨ìˆ˜
     bool validateNode(Node* node, Node* parent);
 };
 
@@ -123,7 +120,7 @@ private:
 
     BVH* bvh1 = nullptr;
     BVH* bvh2 = nullptr;
-    std::queue<std::pair<Node*, Node*>> nodeQueue; // Å¥·Î °ü¸®
-    std::vector<std::pair<Node*, Node*>> collisionPairs; // Ãæµ¹ ¸®½ºÆ®
+    std::queue<std::pair<Node*, Node*>> nodeQueue; // íë¡œ ê´€ë¦¬
+    std::vector<std::pair<Node*, Node*>> collisionPairs; // ì¶©ëŒ ë¦¬ìŠ¤íŠ¸
 
 };
